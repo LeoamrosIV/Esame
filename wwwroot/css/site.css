@@ -47,7 +47,7 @@ app {
 }
 
 .sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+    background-image: linear-gradient(180deg, #731919 0%, #BF7330 70%);
 }
 
     .sidebar .top-row {
@@ -180,4 +180,19 @@ app {
         /* Never collapse the sidebar for wide screens */
         display: block;
     }
+}
+
+
+.hero {
+    background-image: url("../img/ristorante.jpg");
+    background-size: cover;
+    color: white;
+    text-shadow: 0 0 10px black;
+}
+
+
+.card-img-top {
+    width: 100%;
+    height: 15vw;
+    object-fit: cover;
 }
