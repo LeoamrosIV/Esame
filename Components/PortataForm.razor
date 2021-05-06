@@ -1,0 +1,101 @@
+﻿<EditForm class="form-group" Model="@portata" OnValidSubmit="@(e => onSalva.InvokeAsync(portata))">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="portata-descrizione">Descrizione portata</label>
+        <InputText id="portata-descrizione" @bind-Value="portata.Descrizione" class="form-control" placeholder="Inserisci descrizione portata" />
+    </div>
+
+    <div class="form-group">
+        <label for="portata-prezzo">Prezzo portata</label>
+        <InputNumber id="portata-prezzo" @bind-Value="portata.Prezzo" class="form-control" placeholder="Inserisci prezzo portata" />
+    </div>
+
+    <div class="form-group">
+        <label for="portata-tipo">Tipo della portata</label>
+        <select class="custom-select" id="portata-tipo" @bind="portata.IdTipo" placeholder="Seleziona il tipo">
+
+            @foreach (Tipo tipo in db.Tipi)
+            {
+                <option value="@tipo.Id" default>@tipo.Descrizione</option>
+            }
+
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="portata-stagione">Stagione di presentazione della portata</label>
+        <select class="custom-select" id="portata-stagione" @bind="portata.IdStagione" placeholder="Seleziona una stagione">
+
+            @foreach (Stagione stagione in db.Stagioni)
+            {
+                <option value="@stagione.Id" default>@stagione.Descrizione</option>
+            }
+
+        </select>
+    </div>
+
+    <div class="form-group">
+
+        @foreach (Allergene allergene in db.Allergeni)
+        {
+            string descrizione = allergene.Descrizione;
+        <div class="form-check" id="portata-allergeni">
+            @if (allergeni.Contains(allergene.Id))
+            {
+                <input type="checkbox" class="form-check-input" id="allergene-@descrizione" @onchange="eventArgs => { Selezionato(allergene.Id, eventArgs.Value); }" checked />
+            }
+            else
+            {
+                <input type="checkbox" class="form-check-input" id="allergene-@descrizione" @onchange="eventArgs => { Selezionato(allergene.Id, eventArgs.Value); }" />
+            }
+            <label class="form-check-label" for="allergene-@descrizione">@descrizione</label>
+        </div>
+        }
+
+    </div>
+
+    <button class="btn btn-primary">Salva</button>
+    <button type="reset" class="btn btn-danger" @onclick="onAnnulla">Annulla</button>
+</EditForm>
+
+
+@code {
+
+    [Parameter]
+    public Portata portata { get; set; }
+
+    [Parameter]
+    public DbPortate db { get; set; }
+
+    [Parameter]
+    public EventCallback<Portata> onSalva { get; set; }
+
+    [Parameter]
+    public EventCallback onAnnulla { get; set; }
+
+    [Parameter]
+    public List<int> allergeni { get; set; }
+
+
+    /// <summary> Gestisce la selezione degli allergeni. </summary>
+    public void Selezionato(int id_allergene, object selezionato)
+    {
+        if ((bool)selezionato)
+        {
+            if (!allergeni.Contains(id_allergene))
+            {
+                allergeni.Add(id_allergene);
+            }
+        }
+        else
+        {
+            if (allergeni.Contains(id_allergene))
+            {
+                allergeni.Remove(id_allergene);
+            }
+        }
+    }
+
+}

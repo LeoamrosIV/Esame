@@ -1,0 +1,85 @@
+﻿<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Descrizione</th>
+            <th>Prezzo</th>
+            <th>Tipo</th>
+            <th>Stagione</th>
+            <th>Allergeni</th>
+            <th width="1%">Modifica</th>
+            <th width="1%">Cancella</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Portata portata in db.Portate)
+        {
+            <tr>
+                <td>@portata.Descrizione</td>
+                <td>@string.Format("€{0:f2}", portata.Prezzo)</td>
+                <td>@GetTipo(portata)</td>
+                <td>@GetStagione(portata)</td>
+                <td>@GetAllergeni(portata)</td>
+                <td>
+                    <button class="btn btn-primary" @onclick="(e => onModifica.InvokeAsync(portata))">
+                        <span class="oi oi-pencil" style="color: white;"></span>
+                    </button>
+                </td>
+                <td>
+                    <button class="btn btn-danger" @onclick="(e => onElimina.InvokeAsync(portata))">
+                        <span class="oi oi-trash" style="color: white"></span>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+
+    [Parameter]
+    public DbPortate db { get; set; }
+
+    [Parameter]
+    public EventCallback<Portata> onElimina { get; set; }
+
+    [Parameter]
+    public EventCallback<Portata> onModifica { get; set; }
+
+
+    /// <summary> Restituisce una stringa che rappresenta il tipo della portata. </summary>
+    public string GetTipo(Portata portata)
+    {
+        Tipo tipo = db.Tipi.Single(t => t.Id == portata.IdTipo);
+        return tipo.Descrizione;
+    }
+
+
+    /// <summary> Restituisce una stringa che rappresenta la stagione in cui servire la portata. </summary>
+    public string GetStagione(Portata portata)
+    {
+        Stagione stagione= db.Stagioni.Single(s => s.Id == portata.IdStagione);
+        return stagione.Descrizione;
+    }
+
+
+    /// <summary> Restituisce una stringa che rappresenta gli allergeni contenuti nella portata separati da virgola. </summary>
+    public string GetAllergeni(Portata portata)
+    {
+        IQueryable<PortataAllergene> portateAllergeni = db.PortateAllergeni.Where(a => a.IdPortata == portata.Id);
+        List<string> allergeni = new List<string>();
+
+        foreach (PortataAllergene pa in portateAllergeni)
+        {
+            Allergene allergene = db.Allergeni.Single(a => a.Id == pa.IdAllergene);
+            allergeni.Add(allergene.Descrizione);
+        }
+
+        if (allergeni.Count == 0)
+        {
+            return "";
+        }
+
+        return String.Join(", ", allergeni);
+    }
+}
+
