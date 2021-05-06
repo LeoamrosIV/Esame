@@ -20,6 +20,8 @@ Esame
 |   |-- Portata.cs  # rappresenta la struttura dati di una Portata
 |   |-- Allergene.cs  # rappresenta la struttura dati di un Allergene
 |   |-- Stagione.cs  # rappresenta la struttura dati di una Stagione
+|   |-- Tipo.cs  # rappresenta la struttura dati di un Tipo
+|   |-- PortataAllergene.cs  # rappresenta la struttura dati di un oggetto PortataAllergene
 |   |-- DbPortate.cs  # rappresenta il DbContext e quindi la connessione al database
 |   |-- portate.db  # è il database delle portate
 |
@@ -28,12 +30,13 @@ Esame
 |   |
 |   |-- PortateTable.razor  # è il componente che contiene la tabella che descrive gli oggetti Portata presenti in un database
 |   |-- PortataForm.razor  # è il componente che contiene il form per la creazione e modifica di nuovi oggetti Portata
+|   |-- Card.razor  # rappresenta una card, utilizzata in Index.razor
 |
 |
 |-- Pages/  # Contiene gli end points del progetto
 |   |
 |   |-- Index.razor  # descrive la pagina home, dalla quale è possibile accedere al gestore delle portate
-|   |-- Portate.razor  # descrive la pagina di gestione delle portate
+|   |-- GestorePortate.razor  # descrive la pagina di gestione delle portate
 
 ```
 
