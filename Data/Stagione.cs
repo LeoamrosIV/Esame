@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Esame.Data
 {
-    /// <summary> Rappresenta la stagione durante la quale viene servita una portata </summary>
+    /// <summary> Rappresenta la stagione durante la quale viene servita una portata. </summary>
     public class Stagione
     {
         public int Id { get; set; }

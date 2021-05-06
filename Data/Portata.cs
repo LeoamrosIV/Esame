@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Esame.Data
 {
-    /// <summary> Rappresenta la struttura dati di una portata </summary>
+    /// <summary> Rappresenta la struttura dati di una portata. </summary>
     public class Portata
     {
         public int Id { get; set; }
@@ -15,16 +15,14 @@ namespace Esame.Data
         public string Descrizione { get; set; }
 
         [Required(ErrorMessage = "Inserire Prezzo")]
-        public int Prezzo { get; set; }
+        public float Prezzo { get; set; }
 
         [Required(ErrorMessage = "Selezionare il tipo della portata")]
         [Range(1, int.MaxValue, ErrorMessage = "Selezionare il tipo della portata")]
-        public int Tipo { get; set; }
+        public int IdTipo { get; set; }
 
         [Required(ErrorMessage = "Selezionare la stagione di presentazione")]
         [Range(1, int.MaxValue, ErrorMessage = "Selezionare la stagione di presentazione")]
-        public int Stagione { get; set; }
-
-        public List<int> Allergeni { get; set; }
+        public int IdStagione { get; set; }
     }
 }
