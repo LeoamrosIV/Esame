@@ -1,0 +1,153 @@
+﻿@page "/portate";
+@using System.Threading;
+@inject DbPortate db;
+
+<h1>Portate</h1>
+
+@if (attiva == null)
+{
+    <p>In questa pagina puoi aggiungere, modificare o eliminare portate.</p>
+    <button type="button" class="btn btn-primary mb-3" aria-label="Aggiungi una portata" @onclick="Nuovo">
+        <span class="oi oi-plus" style="color: white; margin-right: 10px"></span>
+        Aggiungi una portata
+    </button>
+
+    <PortateTable db="db" onElimina="Elimina" onModifica="Modifica" />
+}
+else
+{
+    <PortataForm portata="attiva" db="db" onSalva="Salva" onAnnulla="Annulla" allergeni="allergeni"/>
+}
+
+
+@code {
+
+    public Portata attiva;
+    public List<int> allergeni;
+
+
+    /// <summary>
+    /// Fa sì che la pagina si aggiorni quando lo stato cambia, in modo
+    /// da sincronizzare i cambiamenti se ci sono più utenti connessi.
+    /// </summary>
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        var timer = new Timer(new TimerCallback(e =>
+        {
+            InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+        }), null, 1000, 1000);
+    }
+
+
+    /// <summary> Elimina una portata dal database. </summary>
+    public void Elimina(Portata portata)
+    {
+        IQueryable<PortataAllergene> attuali = db.PortateAllergeni.Where(pa => pa.IdPortata == portata.Id);
+
+        foreach (PortataAllergene attuale in attuali)
+        {
+            db.PortateAllergeni.Remove(attuale);
+        }
+        db.SaveChanges();
+
+        db.Portate.Remove(portata);
+        db.SaveChanges();
+    }
+
+
+    /// <summary> Aggiunge una portata al database. </summary>
+    public void Aggiungi(Portata portata)
+    {
+        db.Portate.Add(portata);
+        db.SaveChanges();
+    }
+
+
+    /// <summary> Attiva la visualizzazione di modifica. </summary>
+    public void Modifica(Portata portata)
+    {
+        PopolaAllergeni(portata);
+        attiva = portata;
+    }
+
+
+    /// <summary> Salva una nuova portata nel database o aggiorna gli attributi di una portata già esistente. </summary>
+    public void Salva(Portata portata)
+    {
+        Portata selezionata = db.Portate.FirstOrDefault(p => p.Id == portata.Id);
+
+        if (selezionata == null)
+        {
+            Aggiungi(portata);
+            SalvaAllergeni(portata);
+        }
+        else
+        {
+            selezionata.Descrizione = portata.Descrizione;
+            selezionata.Prezzo = portata.Prezzo;
+            selezionata.IdTipo = portata.IdTipo;
+            selezionata.IdStagione = portata.IdStagione;
+            SalvaAllergeni(portata);
+        }
+
+        db.SaveChanges();
+        attiva = null;
+        allergeni = new List<int>();
+    }
+
+
+    /// <summary> Crea un nuovo oggetto portata e passa alla visualizzazione di modifica. </summary>
+    public void Nuovo()
+    {
+        allergeni = new List<int>();
+        attiva = new Portata();
+    }
+
+
+    /// <summary> Annulla le modifiche e torna alla visualizzazione della tabella. </summary>
+    public void Annulla()
+    {
+        allergeni = new List<int>();
+        attiva = null;
+    }
+
+
+    /// <summary> Recupera gli allergeni della portata dal database e li inserisce nella lista `allergeni`. </summary>
+    public void PopolaAllergeni(Portata portata)
+    {
+        allergeni = new List<int>();
+        IQueryable<PortataAllergene> allergeniDellaPortata = db.PortateAllergeni.Where(pa => pa.IdPortata == portata.Id);
+
+        foreach (PortataAllergene allergene in allergeniDellaPortata)
+        {
+            allergeni.Add(allergene.IdAllergene);
+        }
+    }
+
+
+    /// <summary> Salva gli allergeni di una portata. </summary>
+    public void SalvaAllergeni(Portata portata)
+    {
+        IQueryable<PortataAllergene> attuali = db.PortateAllergeni.Where(pa => pa.IdPortata == portata.Id);
+
+        foreach (PortataAllergene attuale in attuali)
+        {
+            db.PortateAllergeni.Remove(attuale);
+        }
+
+        foreach (int id_allergene in allergeni)
+        {
+            PortataAllergene nuovo = new PortataAllergene();
+            nuovo.IdPortata = portata.Id;
+            nuovo.IdAllergene = id_allergene;
+            db.PortateAllergeni.Add(nuovo);
+        }
+
+    }
+}
+
